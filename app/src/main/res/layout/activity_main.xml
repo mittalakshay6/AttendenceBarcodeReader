@@ -6,15 +6,39 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/connectionStatus"
-        android:layout_width="match_parent"
-        android:layout_height="51dp"
-        android:text="TextView" />
-
-    <Button
-        android:id="@+id/initiateConnectionBtn"
+    <EditText
+        android:id="@+id/ipAddrText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="IP Address" />
+
+    <Button
+        android:id="@+id/connectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connect" />
+
+    <TextView
+        android:visibility="invisible"
+        android:id="@+id/regNView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Registration Number" />
+
+    <EditText
+        android:visibility="invisible"
+        android:text="Your Attendance has been marked!"
+        android:id="@+id/confirmView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/startCameraBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Camera" />
 </LinearLayout>
