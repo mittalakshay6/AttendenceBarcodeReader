@@ -1,6 +1,7 @@
 package com.example.akshay.attendencebarcode;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,21 +10,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.akshay.attendencebarcode.clientServer.ConnectionClient;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
-import org.w3c.dom.Text;
-
-import java.net.Inet4Address;
-import java.net.InetAddress;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     TextView regNView;
     EditText ipAddrText;
     EditText confirmView;
+    Button connectButton;
+    boolean isConnected;
 
+    Socket socket;
+
+    private static final int PORT = 1234;
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "BarcodeMain";
 
@@ -35,8 +39,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         regNView = findViewById(R.id.regNView);
         ipAddrText = findViewById(R.id.ipAddrText);
         confirmView = findViewById(R.id.confirmView);
+        connectButton = findViewById(R.id.connectButton);
 
         findViewById(R.id.startCameraBtn).setOnClickListener(this);
+        findViewById(R.id.connectButton).setOnClickListener(this);
+
+        if(isConnected){
+
+        }
     }
 
 
@@ -50,7 +60,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             startActivityForResult(intent, RC_BARCODE_CAPTURE);
         }
-
+        if(v.getId() == R.id.connectButton){
+            Connection connection = new Connection();
+            connection.execute(ipAddrText.getText().toString());
+        }
     }
 
     @Override
@@ -64,6 +77,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     regNView.setText(barcode.displayValue);
                     confirmView.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
+
+                    if(isConnected){
+                        new DataTransfer().execute();
+                    }
                 } else {
 //                    statusMessage.setText(R.string.barcode_failure);
                     Log.d(TAG, "No barcode captured, intent data is null");
@@ -78,4 +95,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+    class DataTransfer extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            DataOutputStream dataOutputStream = null;
+            try {
+                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                dataOutputStream.writeUTF(regNView.getText().toString());
+            } catch (IOException e) {
+                Log.d(TAG, "Data Transfer failed");
+            }
+            return null;
+        }
+    }
+    class Connection extends AsyncTask<String, Void, Boolean>{
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            try {
+                Log.d(TAG, "Creating Socket");
+                socket = new Socket(strings[0], PORT);
+                Log.d(TAG, "Socket connection successful");
+                isConnected=true;
+                return true;
+            } catch (IOException e) {
+                Log.d(TAG, "Socket creation Failed");
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if(aBoolean){
+                connectButton.setText("Connected");
+            }
+            else{
+                connectButton.setText("Connection Failed");
+            }
+            super.onPostExecute(aBoolean);
+        }
+    }
+
 }
