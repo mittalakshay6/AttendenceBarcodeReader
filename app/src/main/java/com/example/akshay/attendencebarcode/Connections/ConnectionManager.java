@@ -6,16 +6,17 @@ import android.util.Log;
 import com.example.akshay.attendencebarcode.R;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ConnectionManager {
     private final String TAG = "ConnectionManager";
     private Socket socket;
-    private String ipAddress;
+    private ServerSocket serverSocket;
 
     public void connectToServer(String ipAddress){
-        Connector connector = new Connector();
-        connector.execute(ipAddress);
+        ConnectionInitiator connectionInitiator = new ConnectionInitiator();
+        connectionInitiator.execute(ipAddress);
     }
     public boolean isConnected(){
         return socket.isConnected();
@@ -25,7 +26,7 @@ public class ConnectionManager {
         return socket;
     }
 
-    class Connector extends AsyncTask<String, Void, Boolean>{
+    class ConnectionInitiator extends AsyncTask<String, Void, Boolean>{
 
         @Override
         protected Boolean doInBackground(String... strings) {
