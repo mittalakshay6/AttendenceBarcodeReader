@@ -53,8 +53,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(intent, RC_BARCODE_CAPTURE);
         }
         if(v.getId() == R.id.connectButton){
+            Log.d(TAG, "Initiating Connection");
             connectionManager = new ConnectionManager();
             connectionManager.connectToServer(ipAddrText.getText().toString());
+//            while(!connectionManager.isConnected());
+            if(connectionManager.isConnected()){
+                connectButton.setText("Connected");
+            }
+            else{
+                connectButton.setText("Connected");
+            }
         }
     }
 
@@ -73,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(connectionManager.isConnected()){
                         dataExchangeHelper = new DataExchangeHelper(connectionManager.getSocket());
                         dataExchangeHelper.sendData(regNView.getText().toString());
+                        Log.d(TAG, "Data Sent");
                     }
                 } else {
 //                    statusMessage.setText(R.string.barcode_failure);
@@ -88,5 +97,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
 }

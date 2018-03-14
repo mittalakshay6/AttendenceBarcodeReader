@@ -12,6 +12,7 @@ import java.net.Socket;
 public class ConnectionManager {
     private final String TAG = "ConnectionManager";
     private Socket socket;
+    boolean isConnected=false;
     private ServerSocket serverSocket;
 
     public void connectToServer(String ipAddress){
@@ -19,7 +20,12 @@ public class ConnectionManager {
         connectionInitiator.execute(ipAddress);
     }
     public boolean isConnected(){
-        return socket.isConnected();
+        if(isConnected) {
+            return socket.isConnected();
+        }
+        else{
+            return false;
+        }
     }
 
     public Socket getSocket() {
@@ -31,14 +37,25 @@ public class ConnectionManager {
         @Override
         protected Boolean doInBackground(String... strings) {
             try {
-                Log.d(TAG, "Connection Initiation started");
-                socket = new Socket(strings[0], R.integer.PORT);
+                Log.d(TAG, "Connection Initiation started" + Integer.valueOf(R.integer.PORT));
+                socket = new Socket(strings[0], 1234);
                 Log.d(TAG, "Connection Established with Server");
-                return true;
+                if(socket.isConnected()) {
+                    return true;
+                }
+                else{
+                    return false;
+                }
             } catch (IOException e) {
                 Log.d(TAG, "Failed to establish connection");
                 return false;
             }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            isConnected=aBoolean;
         }
     }
 }
