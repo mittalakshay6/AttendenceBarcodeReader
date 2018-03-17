@@ -1,6 +1,7 @@
 package com.example.akshay.attendencebarcode;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,13 +15,20 @@ import com.example.akshay.attendencebarcode.Connections.DataExchangeHelper;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+    //TODO add feature to turn flash light on in case of low light
 
     TextView regNView;
     EditText ipAddrText;
     EditText confirmView;
     Button connectButton;
     ConnectionManager connectionManager;
+    Socket socket;
     DataExchangeHelper dataExchangeHelper;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
@@ -54,18 +62,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(v.getId() == R.id.connectButton){
             Log.d(TAG, "Initiating Connection");
-            connectionManager = new ConnectionManager();
-            connectionManager.connectToServer(ipAddrText.getText().toString());
-//            while(!connectionManager.isConnected());
-            if(connectionManager.isConnected()){
-                connectButton.setText("Connected");
-            }
-            else{
-                connectButton.setText("Connected");
+            new ConnectionInitiator().execute(ipAddrText.getText().toString());
+        }
+    }
+    class ConnectionInitiator extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            try {
+                Log.d(TAG, "Connection Initiation started");
+                socket = new Socket(strings[0], 1234);
+                Log.d(TAG, "Connection Established with Server");
+                if(socket.isConnected()) {
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            connectButton.setText("Connected");
+                        }
+                    });
+                    return true;
+                }
+                else{
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            connectButton.setText("Connection failed");
+                        }
+                    });
+                    return false;
+                }
+            } catch (IOException e) {
+                Log.d(TAG, "Failed to establish connection");
+                return false;
             }
         }
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_BARCODE_CAPTURE) {
@@ -78,10 +109,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     confirmView.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
 
-                    if(connectionManager.isConnected()){
-                        dataExchangeHelper = new DataExchangeHelper(connectionManager.getSocket());
-                        dataExchangeHelper.sendData(regNView.getText().toString());
-                        Log.d(TAG, "Data Sent");
+                    if(socket.isConnected()){
+                        DataOutputStream dataOutputStream;
+                        try {
+                            Log.d(TAG, "Data Transfer Initiated");
+                            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                            dataOutputStream.writeUTF(regNView.getText().toString());
+                            Log.d(TAG, "Data Transfer Completed Successfully");
+                        } catch (IOException e) {
+                            Log.e(TAG, "Data Transfer failed "+e.getMessage());
+                        }
                     }
                 } else {
 //                    statusMessage.setText(R.string.barcode_failure);

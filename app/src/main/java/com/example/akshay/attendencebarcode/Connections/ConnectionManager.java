@@ -14,6 +14,7 @@ public class ConnectionManager {
     private Socket socket;
     boolean isConnected=false;
     private ServerSocket serverSocket;
+    private final int PORT = 1234;
 
     public void connectToServer(String ipAddress){
         ConnectionInitiator connectionInitiator = new ConnectionInitiator();
@@ -37,7 +38,7 @@ public class ConnectionManager {
         @Override
         protected Boolean doInBackground(String... strings) {
             try {
-                Log.d(TAG, "Connection Initiation started" + Integer.valueOf(R.integer.PORT));
+                Log.d(TAG, "Connection Initiation started" + PORT);
                 socket = new Socket(strings[0], 1234);
                 Log.d(TAG, "Connection Established with Server");
                 if(socket.isConnected()) {
