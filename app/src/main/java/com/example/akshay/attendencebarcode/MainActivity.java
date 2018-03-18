@@ -8,13 +8,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.akshay.attendencebarcode.Connections.ConnectionManager;
 import com.example.akshay.attendencebarcode.Connections.DataExchangeHelper;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ConnectionManager connectionManager;
     Socket socket;
     DataExchangeHelper dataExchangeHelper;
+    ProgressBar progressBar;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "MainActivityClient";
@@ -39,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = findViewById(R.id.pb_loading_indicator);
+        progressBar.setVisibility(View.INVISIBLE);
         regNView = findViewById(R.id.regNView);
         ipAddrText = findViewById(R.id.ipAddrText);
         confirmView = findViewById(R.id.confirmView);
@@ -62,7 +68,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(v.getId() == R.id.connectButton){
             Log.d(TAG, "Initiating Connection");
+            progressBar.setVisibility(View.VISIBLE);
             new ConnectionInitiator().execute(ipAddrText.getText().toString());
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
     class ConnectionInitiator extends AsyncTask<String, Void, Boolean> {
@@ -73,26 +81,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "Connection Initiation started");
                 socket = new Socket(strings[0], 1234);
                 Log.d(TAG, "Connection Established with Server");
-                if(socket.isConnected()) {
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            connectButton.setText("Connected");
-                        }
-                    });
-                    return true;
-                }
-                else{
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            connectButton.setText("Connection failed");
-                        }
-                    });
-                    return false;
-                }
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        connectButton.setText("Connected");
+                    }
+                });
+                return true;
             } catch (IOException e) {
                 Log.d(TAG, "Failed to establish connection");
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        connectButton.setText("Connection failed");
+                    }
+                });
                 return false;
             }
         }
@@ -106,18 +109,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    statusMessage.setText(R.string.barcode_success);
                     regNView.setVisibility(View.VISIBLE);
                     regNView.setText(barcode.displayValue);
-                    confirmView.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
 
-                    if(socket.isConnected()){
+                    if(socket!=null && socket.isConnected()){
                         DataOutputStream dataOutputStream;
+                        DataInputStream dataInputStream;
                         try {
                             Log.d(TAG, "Data Transfer Initiated");
+                            Toast.makeText(this, "Marking your attendance", Toast.LENGTH_SHORT).show();
                             dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                            dataOutputStream.writeUTF(regNView.getText().toString());
+                            dataOutputStream.writeUTF(barcode.displayValue);
                             Log.d(TAG, "Data Transfer Completed Successfully");
+                            Log.d(TAG, "Receiving data");
+                            dataInputStream = new DataInputStream(socket.getInputStream());
+                            boolean status = dataInputStream.readBoolean();
+                            Log.d(TAG, "Received data "+ status);
+                            if(status) {
+                                Toast.makeText(this, "Your attendance has been marked", Toast.LENGTH_SHORT).show();
+                                confirmView.setVisibility(View.VISIBLE);
+                            }
+                            else{
+                                Toast.makeText(this, "This registration number does not exist in the list. Scan barcode properly", Toast.LENGTH_SHORT).show();
+                                confirmView.setVisibility(View.INVISIBLE);
+                            }
                         } catch (IOException e) {
                             Log.e(TAG, "Data Transfer failed "+e.getMessage());
+                            Toast.makeText(this, "Failed to mark your attendance, please try again", Toast.LENGTH_SHORT).show();
+                            if(socket == null || !socket.isConnected()){
+                                MainActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        connectButton.setText("Connect");
+                                    }
+                                });
+                            }
                         }
                     }
                 } else {
