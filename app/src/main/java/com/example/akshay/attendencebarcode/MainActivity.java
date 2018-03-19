@@ -30,10 +30,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText ipAddrText;
     EditText confirmView;
     Button connectButton;
-    ConnectionManager connectionManager;
     Socket socket;
     DataExchangeHelper dataExchangeHelper;
     ProgressBar progressBar;
+    DataExchangeHelper.DataExchangeHelperListener listener;
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "MainActivityClient";
@@ -68,12 +68,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(v.getId() == R.id.connectButton){
             Log.d(TAG, "Initiating Connection");
-            progressBar.setVisibility(View.VISIBLE);
             new ConnectionInitiator().execute(ipAddrText.getText().toString());
-            progressBar.setVisibility(View.INVISIBLE);
         }
     }
     class ConnectionInitiator extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected Boolean doInBackground(String... strings) {
@@ -99,6 +102,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            progressBar.setVisibility(View.INVISIBLE);
+        }
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -106,52 +115,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
                     Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-//                    statusMessage.setText(R.string.barcode_success);
                     regNView.setVisibility(View.VISIBLE);
                     regNView.setText(barcode.displayValue);
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
-
                     if(socket!=null && socket.isConnected()){
-                        DataOutputStream dataOutputStream;
-                        DataInputStream dataInputStream;
-                        try {
-                            Log.d(TAG, "Data Transfer Initiated");
-                            Toast.makeText(this, "Marking your attendance", Toast.LENGTH_SHORT).show();
-                            dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                            dataOutputStream.writeUTF(barcode.displayValue);
-                            Log.d(TAG, "Data Transfer Completed Successfully");
-                            Log.d(TAG, "Receiving data");
-                            dataInputStream = new DataInputStream(socket.getInputStream());
-                            boolean status = dataInputStream.readBoolean();
-                            Log.d(TAG, "Received data "+ status);
-                            if(status) {
-                                Toast.makeText(this, "Your attendance has been marked", Toast.LENGTH_SHORT).show();
-                                confirmView.setVisibility(View.VISIBLE);
+                        dataExchangeHelper = new DataExchangeHelper(socket, listener = new DataExchangeHelper.DataExchangeHelperListener() {
+                            @Override
+                            public void onStart() {
+                                progressBar.setVisibility(View.VISIBLE);
+                                Toast.makeText(MainActivity.this, "Sending Data", Toast.LENGTH_SHORT).show();
                             }
-                            else{
-                                Toast.makeText(this, "This registration number does not exist in the list. Scan barcode properly", Toast.LENGTH_SHORT).show();
-                                confirmView.setVisibility(View.INVISIBLE);
-                            }
-                        } catch (IOException e) {
-                            Log.e(TAG, "Data Transfer failed "+e.getMessage());
-                            Toast.makeText(this, "Failed to mark your attendance, please try again", Toast.LENGTH_SHORT).show();
-                            if(socket == null || !socket.isConnected()){
-                                MainActivity.this.runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void onCompleted() {
+                                Toast.makeText(MainActivity.this, "Data Transfer done", Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.INVISIBLE);
+                                final DataExchangeHelper dataReceiveHelper = new DataExchangeHelper(socket, new DataExchangeHelper.DataExchangeHelperListener() {
                                     @Override
-                                    public void run() {
-                                        connectButton.setText("Connect");
+                                    public void onStart() {
+                                        progressBar.setVisibility(View.VISIBLE);
+                                        Toast.makeText(MainActivity.this, "Marking your attendance", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onCompleted() {
+                                        Toast.makeText(MainActivity.this, "Attendance marked", Toast.LENGTH_SHORT).show();
+                                        confirmView.setVisibility(View.VISIBLE);
+                                        progressBar.setVisibility(View.INVISIBLE);
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Toast.makeText(MainActivity.this, "Attendance failed to mark", Toast.LENGTH_SHORT).show();
+                                        progressBar.setVisibility(View.INVISIBLE);
                                     }
                                 });
+                                dataReceiveHelper.receiveData();
                             }
-                        }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(MainActivity.this, "Data Transfer Failed", Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                        dataExchangeHelper.sendData(barcode.displayValue);
                     }
                 } else {
-//                    statusMessage.setText(R.string.barcode_failure);
                     Log.d(TAG, "No barcode captured, intent data is null");
                 }
             } else {
-//                statusMessage.setText(String.format(getString(R.string.barcode_error),
-//                        CommonStatusCodes.getStatusCodeString(resultCode)));
                 Log.d(TAG, "There is Some error");
             }
         }
