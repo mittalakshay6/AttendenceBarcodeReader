@@ -1,35 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:padding="50dp">
 
     <EditText
         android:id="@+id/ipAddrText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
+        android:textSize="20sp"
         android:inputType="textPersonName"
-        android:hint="IP Address" />
+        android:hint="Prof's IP Address" />
 
     <Button
         android:id="@+id/connectButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connect" />
+        android:layout_marginTop="20dp"
+        android:text="Connect"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/ipAddrText"
+        android:background="@drawable/custom_button_client"/>
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
         android:layout_width="42dp"
-        android:layout_height="42dp" />
+        android:layout_height="42dp"
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/connectButton"
+        android:layout_centerHorizontal="true"/>
 
     <TextView
         android:visibility="invisible"
         android:id="@+id/regNView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Registration Number" />
+        android:text="Registration Number"
+        android:layout_below="@id/pb_loading_indicator"
+        android:layout_centerHorizontal="true"/>
 
     <EditText
         android:visibility="invisible"
@@ -38,11 +48,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:layout_below="@id/regNView"
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:id="@+id/startCameraBtn"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Camera" />
-</LinearLayout>
+        android:text="Start Camera"
+        android:layout_below="@id/confirmView"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/custom_button_client"/>
+</RelativeLayout>
