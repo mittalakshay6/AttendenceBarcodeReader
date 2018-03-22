@@ -11,9 +11,7 @@ import java.net.Socket;
 public class DataExchangeHelper {
 
     private Socket socket;
-    private boolean isDataSent;
-    private boolean receivedData;
-    private boolean isDataReceived;
+    private static Character receivedData;
     private DataExchangeHelperListener listener;
 
     private static final String TAG = "DataTransfer";
@@ -23,20 +21,10 @@ public class DataExchangeHelper {
     }
 
     public void sendData(String data){
-        this.isDataSent=false;
         new DataSender().execute(data);
     }
 
-    public boolean isDataSent(){
-        return this.isDataSent;
-    }
-
-    public boolean isDataReceived(){
-        return this.isDataReceived;
-    }
-
     public void receiveData(){
-        this.isDataReceived=false;
         new DataReceiver().execute();
     }
 
@@ -66,7 +54,6 @@ public class DataExchangeHelper {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            isDataSent=aBoolean;
             if(aBoolean) {
                 listener.onCompleted();
             }
@@ -88,9 +75,9 @@ public class DataExchangeHelper {
             Log.d(TAG,"Data Receiving initiated");
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
-                receivedData = dataInputStream.readBoolean();
+                receivedData = dataInputStream.readChar();
                 Log.d(TAG, "Data Received successfully");
-                return receivedData;
+                return true;
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
                 return false;
@@ -99,7 +86,6 @@ public class DataExchangeHelper {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            isDataReceived=aBoolean;
             if(aBoolean){
                 listener.onCompleted();
             }
@@ -109,7 +95,7 @@ public class DataExchangeHelper {
         }
     }
 
-    public boolean getReceivedData() {
+    public static Character getReceivedData() {
         return receivedData;
     }
 

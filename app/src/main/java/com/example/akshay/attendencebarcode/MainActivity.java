@@ -26,14 +26,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //TODO add feature to turn flash light on in case of low light
 
-    TextView regNView;
-    EditText ipAddrText;
-    EditText confirmView;
-    Button connectButton;
-    Socket socket;
-    DataExchangeHelper dataExchangeHelper;
-    ProgressBar progressBar;
-    DataExchangeHelper.DataExchangeHelperListener listener;
+    private TextView regNView;
+    private EditText ipAddrText;
+    private EditText confirmView;
+    private Button connectButton;
+    private Socket socket;
+    private DataExchangeHelper dataExchangeHelper;
+    private ProgressBar progressBar;
+    private DataExchangeHelper.DataExchangeHelperListener listener;
+
+    public static final Character SEND_SUCCESS = 'S';
+    public static final Character SEND_FAIL_INVALID = 'I';
+    public static final Character SEND_SUCCESS_PROXY = 'P';
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "MainActivityClient";
@@ -123,12 +127,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onStart() {
                                 progressBar.setVisibility(View.VISIBLE);
-                                Toast.makeText(MainActivity.this, "Sending Data", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onCompleted() {
-                                Toast.makeText(MainActivity.this, "Data Transfer done", Toast.LENGTH_SHORT).show();
                                 progressBar.setVisibility(View.INVISIBLE);
                                 final DataExchangeHelper dataReceiveHelper = new DataExchangeHelper(socket, new DataExchangeHelper.DataExchangeHelperListener() {
                                     @Override
@@ -139,14 +141,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                     @Override
                                     public void onCompleted() {
-                                        Toast.makeText(MainActivity.this, "Attendance marked", Toast.LENGTH_SHORT).show();
-                                        confirmView.setVisibility(View.VISIBLE);
+                                        Character receivedData = DataExchangeHelper.getReceivedData();
+                                        if(receivedData==SEND_SUCCESS){
+                                            Toast.makeText(MainActivity.this, "Attendance Marked", Toast.LENGTH_SHORT).show();
+                                            confirmView.setText("Congratulations, your attendance has been marked");
+                                            confirmView.setVisibility(View.VISIBLE);
+                                        }
+                                        else if(receivedData==SEND_SUCCESS_PROXY){
+                                            Toast.makeText(MainActivity.this, "Trying for a proxy?", Toast.LENGTH_SHORT).show();
+                                            confirmView.setText("Trying for a proxy? Attendance has been marked but this incident will be reported");
+                                            confirmView.setVisibility(View.VISIBLE);
+                                        }
+                                        // TODO proxy will be reported on second try. Make it correct
+                                        else if(receivedData==SEND_FAIL_INVALID){
+                                            Toast.makeText(MainActivity.this, "Invalid registration number. Please try again", Toast.LENGTH_SHORT).show();
+                                            confirmView.setText("Provided Registration does not exist in the database. Please try again with a valid registration number");
+                                            confirmView.setVisibility(View.VISIBLE);
+                                        }
                                         progressBar.setVisibility(View.INVISIBLE);
                                     }
 
                                     @Override
                                     public void onError() {
                                         Toast.makeText(MainActivity.this, "Attendance failed to mark", Toast.LENGTH_SHORT).show();
+                                        confirmView.setText("Connect and try again");
+                                        confirmView.setVisibility(View.VISIBLE);
                                         progressBar.setVisibility(View.INVISIBLE);
                                     }
                                 });
@@ -155,7 +174,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onError() {
-                                Toast.makeText(MainActivity.this, "Data Transfer Failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Data Transfer Failed, please to connect again", Toast.LENGTH_SHORT).show();
+                                confirmView.setText("Connect and try again");
+                                confirmView.setVisibility(View.VISIBLE);
                                 progressBar.setVisibility(View.INVISIBLE);
                             }
                         });
