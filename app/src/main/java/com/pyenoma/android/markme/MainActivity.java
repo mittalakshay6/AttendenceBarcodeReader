@@ -1,4 +1,4 @@
-package com.example.akshay.attendencebarcode;
+package com.pyenoma.android.markme;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,8 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.akshay.attendencebarcode.Connections.ConnectionManager;
-import com.example.akshay.attendencebarcode.Connections.DataExchangeHelper;
+import com.pyenoma.android.markme.Connections.ConnectionManager;
+import com.pyenoma.android.markme.Connections.DataExchangeHelper;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 

@@ -1,4 +1,4 @@
-package com.example.akshay.attendencebarcode;
+package com.pyenoma.android.markme;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.akshay.attendencebarcode", appContext.getPackageName());
+        assertEquals("com.pyenoma.android.markme", appContext.getPackageName());
     }
 }

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.akshay.attendencebarcode;
+package com.pyenoma.android.markme;
 
 import android.content.Context;
 
-import com.example.akshay.attendencebarcode.ui.camera.GraphicOverlay;
+import com.pyenoma.android.markme.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;

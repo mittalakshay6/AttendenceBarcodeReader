@@ -1,4 +1,4 @@
-package com.example.akshay.attendencebarcode;
+package com.pyenoma.android.markme;
 
 import android.content.Intent;
 import android.os.Handler;

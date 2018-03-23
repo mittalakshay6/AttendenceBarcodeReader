@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.akshay.attendencebarcode"
+    package="com.pyenoma.android.markme"
     android:installLocation="auto">
 
     <uses-feature android:name="android.hardware.camera2" />
@@ -21,10 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
         <meta-data
-            android:name="com.example.akshay.attendencebarcode.version"
+            android:name="com.pyenoma.android.markme.version"
             android:value="11910000" />
         <meta-data
-            android:name="com.example.akshay.attendencebarcode.DEPENDENCIES"
+            android:name="com.pyenoma.android.markme.DEPENDENCIES"
             android:value="barcode" />
 
         <activity

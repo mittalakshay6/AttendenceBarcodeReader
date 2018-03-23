@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.akshay.attendencebarcode.ui.camera;
+package com.pyenoma.android.markme.ui.camera;
 
 import android.Manifest;
 import android.content.Context;

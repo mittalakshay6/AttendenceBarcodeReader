@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.akshay.attendencebarcode;
+package com.pyenoma.android.markme;
 
 import android.content.Context;
 import android.support.annotation.UiThread;
 
-import com.example.akshay.attendencebarcode.ui.camera.GraphicOverlay;
+import com.pyenoma.android.markme.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -75,7 +75,7 @@ public class BarcodeGraphicTracker extends Tracker<Barcode> {
 
     /**
      * Hide the graphic when the corresponding object was not detected.  This can happen for
-     * intermediate frames temporarily, for example if the object was momentarily blocked from
+     * intermediate frames temporarily, for pyenoma if the object was momentarily blocked from
      * view.
      */
     @Override

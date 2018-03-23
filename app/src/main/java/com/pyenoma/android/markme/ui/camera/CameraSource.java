@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.akshay.attendencebarcode.ui.camera;
+package com.pyenoma.android.markme.ui.camera;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -332,6 +332,7 @@ public class CameraSource {
      *
      * @throws IOException if the camera's preview texture or display could not be initialized
      */
+    @SuppressLint("MissingPermission")
     @RequiresPermission(Manifest.permission.CAMERA)
     public CameraSource start() throws IOException {
         synchronized (mCameraLock) {
@@ -366,6 +367,7 @@ public class CameraSource {
      * @param surfaceHolder the surface holder to use for the preview frames
      * @throws IOException if the supplied surface holder could not be used as the preview display
      */
+    @SuppressLint("MissingPermission")
     @RequiresPermission(Manifest.permission.CAMERA)
     public CameraSource start(SurfaceHolder surfaceHolder) throws IOException {
         synchronized (mCameraLock) {
@@ -954,7 +956,7 @@ public class CameraSource {
 
         // The method for selecting the best range is to minimize the sum of the differences between
         // the desired value and the upper and lower bounds of the range.  This may select a range
-        // that the desired value is outside of, but this is often preferred.  For example, if the
+        // that the desired value is outside of, but this is often preferred.  For pyenoma, if the
         // desired frame rate is 29.97, the range (30, 30) is probably more desirable than the
         // range (15, 30).
         int[] selectedFpsRange = null;

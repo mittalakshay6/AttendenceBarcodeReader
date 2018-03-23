@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.akshay.attendencebarcode;
+package com.pyenoma.android.markme;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -38,9 +38,9 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.akshay.attendencebarcode.ui.camera.CameraSource;
-import com.example.akshay.attendencebarcode.ui.camera.CameraSourcePreview;
-import com.example.akshay.attendencebarcode.ui.camera.GraphicOverlay;
+import com.pyenoma.android.markme.ui.camera.CameraSource;
+import com.pyenoma.android.markme.ui.camera.CameraSourcePreview;
+import com.pyenoma.android.markme.ui.camera.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -382,7 +382,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
          * @return Whether or not the detector should consider this event
          * as handled. If an event was not handled, the detector
          * will continue to accumulate movement until an event is
-         * handled. This can be useful if an application, for example,
+         * handled. This can be useful if an application, for pyenoma,
          * only wants to update scaling factors if the change is
          * greater than 0.01.
          */
@@ -398,7 +398,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
          * @param detector The detector reporting the event - use this to
          *                 retrieve extended info about event state.
          * @return Whether or not the detector should continue recognizing
-         * this gesture. For example, if a gesture is beginning
+         * this gesture. For pyenoma, if a gesture is beginning
          * with a focal point outside of a region where it makes
          * sense, onScaleBegin() may return false to ignore the
          * rest of the gesture.
