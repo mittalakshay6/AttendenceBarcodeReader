@@ -5,8 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,8 +27,6 @@ import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    //TODO add feature to turn flash light on in case of low light
-
     private TextView regNView;
     private EditText ipAddrText;
     private EditText confirmView;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DataExchangeHelper dataExchangeHelper;
     private ProgressBar progressBar;
     private DataExchangeHelper.DataExchangeHelperListener listener;
+    private CompoundButton flashLightBtn;
 
     public static final Character SEND_SUCCESS = 'S';
     public static final Character SEND_FAIL_INVALID = 'I';
@@ -47,12 +49,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        flashLightBtn = findViewById(R.id.flashLightBtn);
         progressBar = findViewById(R.id.pb_loading_indicator);
         progressBar.setVisibility(View.INVISIBLE);
         regNView = findViewById(R.id.regNView);
         ipAddrText = findViewById(R.id.ipAddrText);
         confirmView = findViewById(R.id.confirmView);
         connectButton = findViewById(R.id.connectButton);
+
+        ipAddrText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    new ConnectionInitiator().execute(ipAddrText.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
 
         findViewById(R.id.startCameraBtn).setOnClickListener(this);
         findViewById(R.id.connectButton).setOnClickListener(this);
@@ -64,9 +78,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.startCameraBtn) {
             // launch barcode activity.
+            if(socket==null){
+                Toast.makeText(this, "Please connect to the server first", Toast.LENGTH_SHORT).show();
+                connectButton.setText("Connect");
+                return;
+            }
+            else if(!socket.isConnected()){
+                Toast.makeText(this, "Please connect to the server first", Toast.LENGTH_SHORT).show();
+                connectButton.setText("Connect");
+                return;
+            }
             Intent intent = new Intent(this, BarcodeCaptureActivity.class);
             intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
-            intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
+            intent.putExtra(BarcodeCaptureActivity.UseFlash, flashLightBtn.isChecked());
 
             startActivityForResult(intent, RC_BARCODE_CAPTURE);
         }
@@ -91,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
                         connectButton.setText("Connected");
                     }
                 });
@@ -100,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Toast.makeText(MainActivity.this, "Connection failed, please try again", Toast.LENGTH_SHORT).show();
                         connectButton.setText("Connection failed");
                     }
                 });
@@ -152,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             confirmView.setText("Trying for a proxy? Attendance has been marked but this incident will be reported");
                                             confirmView.setVisibility(View.VISIBLE);
                                         }
-                                        // TODO proxy will be reported on second try. Make it correct
                                         else if(receivedData==SEND_FAIL_INVALID){
                                             Toast.makeText(MainActivity.this, "Invalid registration number. Please try again", Toast.LENGTH_SHORT).show();
                                             confirmView.setText("Provided Registration does not exist in the database. Please try again with a valid registration number");

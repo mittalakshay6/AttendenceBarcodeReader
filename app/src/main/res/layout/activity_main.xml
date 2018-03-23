@@ -11,9 +11,11 @@
         android:id="@+id/ipAddrText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:inputType="textPersonName"
-        android:hint="Prof's IP Address" />
+        android:hint="IP Address"
+        android:inputType="phone"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/connectButton"
@@ -23,7 +25,9 @@
         android:text="Connect"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/ipAddrText"
-        android:background="@drawable/custom_button_client"/>
+        android:background="@drawable/custom_button_client"
+        android:imeOptions="actionDone"
+        android:textColor="#ffff"/>
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
         android:layout_width="42dp"
@@ -59,5 +63,20 @@
         android:text="Start Camera"
         android:layout_below="@id/confirmView"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/custom_button_client"/>
+        android:background="@drawable/custom_button_client"
+        android:textColor="#ffff"/>
+
+    <Switch
+        android:id="@+id/flashLightBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:textOff="Flash Off"
+        android:textOn="Flash On"
+        android:text="Flashlight"
+        android:checked="false"
+        android:textColor="@color/colorPrimary"
+        android:shadowColor="@color/colorPrimaryDark" />
 </RelativeLayout>
