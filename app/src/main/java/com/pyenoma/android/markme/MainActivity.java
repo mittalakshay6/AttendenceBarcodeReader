@@ -81,10 +81,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(socket==null){
                 Toast.makeText(this, "Please connect to the server first", Toast.LENGTH_SHORT).show();
                 connectButton.setText("Connect");
+                confirmView.setVisibility(View.INVISIBLE);
+                regNView.setVisibility(View.INVISIBLE);
                 return;
             }
             else if(!socket.isConnected()){
                 Toast.makeText(this, "Please connect to the server first", Toast.LENGTH_SHORT).show();
+                connectButton.setText("Connect");
+                confirmView.setVisibility(View.INVISIBLE);
+                regNView.setVisibility(View.INVISIBLE);
+                return;
+            }
+            else if(!connectButton.getText().toString().equals("Connected")){
+                Toast.makeText(this, "Please connect to the server first", Toast.LENGTH_SHORT).show();
+                confirmView.setVisibility(View.INVISIBLE);
+                regNView.setVisibility(View.INVISIBLE);
                 connectButton.setText("Connect");
                 return;
             }
@@ -96,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(v.getId() == R.id.connectButton){
             Log.d(TAG, "Initiating Connection");
+            confirmView.setVisibility(View.INVISIBLE);
+            regNView.setVisibility(View.INVISIBLE);
             new ConnectionInitiator().execute(ipAddrText.getText().toString());
         }
     }
@@ -184,6 +197,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             confirmView.setVisibility(View.VISIBLE);
                                         }
                                         progressBar.setVisibility(View.INVISIBLE);
+                                        try {
+                                            socket.close();
+                                        } catch (IOException e) {
+                                            Log.e(TAG, "Cannot close socket");
+                                        }
+                                        connectButton.setText("Connect");
+//                                        regNView.setVisibility(View.INVISIBLE);
+//                                        confirmView.setVisibility(View.INVISIBLE);
                                     }
 
                                     @Override

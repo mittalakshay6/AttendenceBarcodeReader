@@ -21,10 +21,18 @@ public class DataExchangeHelper {
     }
 
     public void sendData(String data){
+        if(socket == null || !socket.isConnected()){
+            listener.onError();
+            return;
+        }
         new DataSender().execute(data);
     }
 
     public void receiveData(){
+        if(socket == null || !socket.isConnected()){
+            listener.onError();
+            return;
+        }
         new DataReceiver().execute();
     }
 
