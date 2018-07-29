@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.ajts.androidmads.SQLite2Excel:library-1.0.2">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.2.aar/cb97399964fa6525cfc123ef047cc7b9/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.2.aar/cb97399964fa6525cfc123ef047cc7b9/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.2.aar/ba14d9a7f8b87c3911cee417be8b6241/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.0.2.aar/ba14d9a7f8b87c3911cee417be8b6241/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

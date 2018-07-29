@@ -15,13 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pyenoma.android.markme.Connections.ConnectionManager;
-import com.pyenoma.android.markme.Connections.DataExchangeHelper;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.pyenoma.android.markme.Connections.DataExchangeHelper;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
